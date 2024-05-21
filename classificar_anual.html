@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classificador Anual</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        .output {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #333;
+        }
+        .info {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Classificador Anual</h1>
+        <input type="text" id="userInput" placeholder="Digite um ano">
+        <button onclick="atualizarPagina()">Classificar</button>
+        <div class="output" id="output"></div>
+    </div>
+
+    <script>
+        // melhorar pontuações para ficarem de 0 a 10
+        var pontuacoes_dias = [-1.5, 1.5, 2.5, 1, 2.5, 1.5, -1.5];
+        
+        function gerarInformacoes(ano) {
+            let lista_feriados = [
+                { nome: "Confraternização Universal", data: new Date(parseInt(ano), 0, 1)},
+                { nome: "Carnaval", data: calcularCarnaval(ano)},
+                { nome: "Cinzas", data: calcularCinzas(ano)},
+                { nome: "Sexta-Feira Santa", data: calcularSextaFeiraSanta(ano)},
+                { nome: "Páscoa", data: calcularPascoa(ano)},
+                { nome: "Tiradentes", data: new Date(parseInt(ano), 3, 21)},
+                { nome: "Dia do Trabalho", data: new Date(parseInt(ano), 4, 1)},
+                { nome: "Corpus Cristi (Corpo de Deus)", data: calcularCorpusChristi(ano)},
+                { nome: "Independência do Brasil", data: new Date(parseInt(ano), 8, 7)},
+                { nome: "Nossa Senhora Aparecida", data: new Date(parseInt(ano), 9, 12)},
+                { nome: "Finados", data: new Date(parseInt(ano), 10, 2)},
+                { nome: "Proclamação da República", data: new Date(parseInt(ano), 10, 15)},
+                { nome: "Dia da Consciência Negra", data: new Date(parseInt(ano), 10, 20)},
+                { nome: "Natal", data: new Date(parseInt(ano), 11, 25)},
+                ];
+
+            // Define os nomes dos dias da semana
+            var diasDaSemana = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"];
+            //var potuacoes_dias = [-1.5, 1.5, 2.5, 1, 2.5, 1.5, -1.5];
+            
+            var pontuacao_ano = 0;
+            var tabela_feriados_dia_semana = ``;
+            var feriadosSemana = [0, 0, 0, 0, 0, 0, 0];
+            var tabela_feriados = ``;
+            // Obtém o dia da semana (0 - domingo, 1 - segunda-feira, ..., 6 - sábado)
+            lista_feriados.forEach(feriado => {
+                var pontuacao_dia = 0;
+                feriadosSemana[feriado.data.getDay()] += 1;
+                pontuacao_dia += pontuacoes_dias[feriado.data.getDay()]; // essa linha feriado.data.getDay()
+                
+                if (feriado.data.getDay() == 3 && feriado.nome == "Cinzas") {
+                    pontuacao_dia -= 0.5;
+                }
+                tabela_feriados += `Feriado: ${feriado.nome} - Data: ${feriado.data.toLocaleDateString('pt-BR')} (${diasDaSemana[feriado.data.getDay()]}) (${pontuacao_dia} pts)<br>`;
+                pontuacao_ano += pontuacao_dia;
+            });
+            
+            var classificacao
+            if (pontuacao_ano < 5.5) {
+                classificacao = `Ano infernal`;
+            } else if (pontuacao_ano == 5.5) {
+                classificacao = `F, pior ano possível`;
+            } else if (pontuacao_ano >= 5.5 && pontuacao_ano < 10) {
+                classificacao = `Paia`;
+            } else if (pontuacao_ano >= 10 && pontuacao_ano < 12.5) {
+                classificacao = `Amatongas`;
+            } else if (pontuacao_ano >= 12.5 && pontuacao_ano < 15) {
+                classificacao = `Oskay`;
+            } else if (pontuacao_ano >= 15 && pontuacao_ano < 17.5) {
+                classificacao = `Nice Year`;
+            } else if (pontuacao_ano >= 17.5 && pontuacao_ano < 20) {
+                classificacao = `FODA`;
+            } else if (pontuacao_ano == 20) {
+                classificacao = `Parabéns, melhor ano possível!`;
+            } else {
+                classificacao = `Estatisticamente impossível isso`;
+            }
+            tabela_feriados += `<b>Classificação:</b> ${classificacao}<br>`;
+
+            tabela_feriados_dia_semana += `<b>Feriados por Dia da Semana</b> <br>`;
+            for (let i = 0; i < diasDaSemana.length; i++) {
+                tabela_feriados_dia_semana += `${diasDaSemana[i]}: ${feriadosSemana[i]} (${feriadosSemana[i] * pontuacoes_dias[i]} pts)<br>`;
+            }
+
+
+
+            
+            function calcularPascoa(ano) {
+                var a = ano % 19;
+                var b = Math.floor(ano / 100);
+                var c = ano % 100;
+                var d = Math.floor(b / 4);
+                var e = b % 4;
+                var f = Math.floor((b + 8) / 25);
+                var g = Math.floor((b - f + 1) / 3);
+                var h = (19 * a + b - d - g + 15) % 30;
+                var i = Math.floor(c / 4);
+                var k = c % 4;
+                var l = (32 + 2 * e + 2 * i - h - k) % 7;
+                var m = Math.floor((a + 11 * h + 22 * l) / 451);
+                var mes = Math.floor((h + l - 7 * m + 114) / 31);
+                var dia = ((h + l - 7 * m + 114) % 31) + 1;
+
+                return new Date(ano, mes - 1, dia);
+            }
+
+            function calcularCarnaval(ano) {
+                var dataPascoa = calcularPascoa(ano);
+                var dataCarnaval = new Date(dataPascoa);
+                dataCarnaval.setDate(dataPascoa.getDate() - 47);
+
+                return dataCarnaval;
+            }
+
+            function calcularCinzas(ano) {
+                var dataCarnaval = calcularCarnaval(ano);
+                var dataCinzas = new Date(dataCarnaval);
+                dataCinzas.setDate(dataCarnaval.getDate() + 1);
+
+                return dataCinzas;
+            }
+
+            function calcularSextaFeiraSanta(ano) {
+                var dataPascoa = calcularPascoa(ano);
+                var dataSextaFeiraSanta = new Date(dataPascoa);
+                dataSextaFeiraSanta.setDate(dataPascoa.getDate() - 2);
+
+                return dataSextaFeiraSanta;
+            }
+
+            function calcularCorpusChristi(ano) {
+                var dataPascoa = calcularPascoa(ano);
+                var dataCorpusChristi = new Date(dataPascoa);
+                dataCorpusChristi.setDate(dataPascoa.getDate() + 60);
+
+                return dataCorpusChristi;
+            }
+
+            return {
+                mensagem: `O ano de ${ano} recebeu a nota: ${pontuacao_ano}`,
+                titulo_tabela: `<b>FERIADOS</b>`,
+                tabela: tabela_feriados,
+                tabela_dias: tabela_feriados_dia_semana
+            };
+        }
+
+        function atualizarPagina() {
+            var userInput = document.getElementById('userInput').value;
+            var info = gerarInformacoes(userInput);
+
+            var outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = `
+                <div class="info">${info.mensagem}</div>
+                <div class="info">${info.titulo_tabela}</div>
+                <div class="info">${info.tabela}</div>
+                <div class="info">${info.tabela_dias}</div>
+            `;
+
+            // Criar a tabela HTML para os feriados
+            var tabelaFeriadosHTML = '<table>';
+            tabelaFeriadosHTML += '<tr><th>Feriado</th><th>Data</th><th>Dia da Semana</th><th>Pontuação</th></tr>';
+            info.tabela.forEach(function(feriado) {
+                tabelaFeriadosHTML += `<tr><td>${feriado.nome}</td><td>${feriado.data}</td><td>${feriado.diaSemana}</td><td>${feriado.pontuacao}</td></tr>`;
+            });
+            tabelaFeriadosHTML += '</table>';
+
+            // Substituir a div com a tabela HTML
+            var tabelaDiv = document.createElement('div');
+            tabelaDiv.innerHTML = tabelaFeriadosHTML;
+            outputDiv.appendChild(tabelaDiv);
+        }
+
+    </script>
+</body>
+</html>

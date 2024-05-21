@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feriados Móveis</title>
+</head>
+<body>
+    <h1>Feriados Móveis</h1>
+    <p id="feriadosMoveis"></p>
+
+    <script>
+        function calcularPascoa(ano) {
+            var a = ano % 19;
+            var b = Math.floor(ano / 100);
+            var c = ano % 100;
+            var d = Math.floor(b / 4);
+            var e = b % 4;
+            var f = Math.floor((b + 8) / 25);
+            var g = Math.floor((b - f + 1) / 3);
+            var h = (19 * a + b - d - g + 15) % 30;
+            var i = Math.floor(c / 4);
+            var k = c % 4;
+            var l = (32 + 2 * e + 2 * i - h - k) % 7;
+            var m = Math.floor((a + 11 * h + 22 * l) / 451);
+            var mes = Math.floor((h + l - 7 * m + 114) / 31);
+            var dia = ((h + l - 7 * m + 114) % 31) + 1;
+
+            return new Date(ano, mes - 1, dia);
+        }
+
+        function calcularCarnaval(ano) {
+            var dataPascoa = calcularPascoa(ano);
+            var dataCarnaval = new Date(dataPascoa);
+            dataCarnaval.setDate(dataPascoa.getDate() - 47);
+
+            return dataCarnaval;
+        }
+
+        function calcularSextaFeiraSanta(ano) {
+            var dataPascoa = calcularPascoa(ano);
+            var dataSextaFeiraSanta = new Date(dataPascoa);
+            dataSextaFeiraSanta.setDate(dataPascoa.getDate() - 2);
+
+            return dataSextaFeiraSanta;
+        }
+
+        function calcularCorpusChristi(ano) {
+            var dataPascoa = calcularPascoa(ano);
+            var dataCorpusChristi = new Date(dataPascoa);
+            dataCorpusChristi.setDate(dataPascoa.getDate() + 60);
+
+            return dataCorpusChristi;
+        }
+
+        var anoAtual = new Date().getFullYear();
+        
+        var dataPascoa = calcularPascoa(anoAtual);
+        var dataCarnaval = calcularCarnaval(anoAtual);
+        var dataSextaFeiraSanta = calcularSextaFeiraSanta(anoAtual);
+        var dataCorpusChristi = calcularCorpusChristi(anoAtual);
+
+        var options = { year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('feriadosMoveis').innerHTML = `
+            <p>Páscoa: ${dataPascoa.toLocaleDateString('pt-BR', options)}</p>
+            <p>Carnaval: ${dataCarnaval.toLocaleDateString('pt-BR', options)}</p>
+            <p>Sexta-feira Santa: ${dataSextaFeiraSanta.toLocaleDateString('pt-BR', options)}</p>
+            <p>Corpus Christi: ${dataCorpusChristi.toLocaleDateString('pt-BR', options)}</p>
+        `;
+    </script>
+</body>
+</html>
